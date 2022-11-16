@@ -25,6 +25,8 @@ To download MvTec AD dataset please enter the root directory and execute the fol
 ```bash
 cd <uflow-root-folder>/data
 wget https://www.mydrive.ch/shares/38536/3830184030e49fe74747669442f0f282/download/420938113-1629952094/mvtec_anomaly_detection.tar.xz
+tar -xvf mvtec_anomaly_detection.tar.xz
+rm -xvf mvtec_anomaly_detection.tar.xz
 ```
 
 # [Optional] Download pre-trained models
@@ -57,28 +59,66 @@ export PYTHONPATH=$PYTHONPATH:<uflow-root-folder>
 
 ## Train
 
-For training
-
-
-
-
-
-### Run
- Next, run it using `main.py`, and passing the image path. 
-
-A test image is provided in `./images/test_image_01.jpg`
-
-For example:
- ```bash
-python main.py images/test_image_01.jpg
+For training, the only command line argument required is the category:
+```bash
+usage: train.py [-h] -cat CATEGORY [-config CONFIG_PATH] [-data DATA] [-train_dir TRAINING_DIR]
 ```
 
-Other additional optional arguments:
+A basic execution could be for example:
+```bash
+python src/train.py -cat carpet
+```
 
-| **Argument short name** | **Argument long name** |                                          **Description**                                           |     **Default value**     |
-|:-----------------------:|:----------------------:|:--------------------------------------------------------------------------------------------------:|:-------------------------:|
-|       image_path        |       image_path       |                                    Path of the image to process                                    | None (mandatory argument) |
-|          -thr           |  --log_nfa_threshold   |                    Threshold over the computed NFA map, for final segmentation.                    |             0             |
-|        -dist_thr        |  --distance_threshold  |       Threshold over the squared Mahalanobis distances, for computing the candidate regions.       |            0.5            |
-|           -s            |         --size         |                          Input size for ResNet. Must be divisible by 32.                           |            256            |
-|          -pca           |       --pca_std        | If float: the percentage of the variance to keep in PCA. If int: the number of components to keep. |            35             |
+Command line arguments:
+
+| **Argument short name** | **Argument long name** |                                                                        **Description**                                                                        |                             **Default value**                             |
+|:-----------------------:|:----------------------:|:-------------------------------------------------------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------:|
+|          -cat           |       --category       | MvTec category to train. One of [carpet, grid, leather, tile, wood, bottle, cable, capsule, hazelnut, metal_nut, pill, screw, toothbrush, transistor, zipper] |                         None (mandatory argument)                         |
+|         -config         |     --config_path      |                                       Config file path. If Not specified, uses the default config in `configs` folder.                                        | None: loads the config in `configs` folder for the corresponding category |
+|          -data          |         --data         |                                 Folder with MvTec AD dataset. Inside this folder there must be one folder for each category.                                  |                          uflow-root-folder/data                           |
+|       -train_dir        |     --training_dir     |                                                             Folder to save training experiments.                                                              |                        uflow-root-folder/training                         |
+
+
+The script will generate logs inside `<uflow-root-folder>/training` folder (or a different one if you changed it with the command line arguments), and will log metrics and images to tensorboard.
+
+Tensorboard can be executed as:
+```bash
+cd <uflow-root-folder>/training
+tensorboard --logdir .
+```
+
+## Predict
+This script performs the inference image by image for the chosen category and displays the results.
+
+```bash
+usage: predict.py [-h] -cat CATEGORY [-data DATA]
+```
+
+| **Argument short name** | **Argument long name** |                                                                        **Description**                                                                        |   **Default value**    |
+|:-----------------------:|:----------------------:|:-------------------------------------------------------------------------------------------------------------------------------------------------------------:|:----------------------:|
+|          -cat           |       --category       | MvTec category to train. One of [carpet, grid, leather, tile, wood, bottle, cable, capsule, hazelnut, metal_nut, pill, screw, toothbrush, transistor, zipper] |         carpet         |
+|          -data          |         --data         |                                 Folder with MvTec AD dataset. Inside this folder there must be one folder for each category.                                  | uflow-root-folder/data |
+
+For example use like this:
+```bash
+python src/predict.py -cat carpet
+```
+
+## Evaluate
+This script run the inference and evaluates auroc and segmentation iou, for reproducing results.
+
+```bash
+usage: evaluate.py [-h] -cat CATEGORIES [CATEGORIES ...] [-data DATA]
+                   [-hp HIGH_PRECISION]
+```
+
+| **Argument short name** | **Argument long name** |                                                                            **Description**                                                                            |            **Default value**             |
+|:-----------------------:|:----------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:----------------------------------------:|
+|          -cat           |       --category       | MvTec categories to train. A subset of [carpet, grid, leather, tile, wood, bottle, cable, capsule, hazelnut, metal_nut, pill, screw, toothbrush, transistor, zipper]. | None: meaning to run over all categories |
+|          -data          |         --data         |                                     Folder with MvTec AD dataset. Inside this folder there must be one folder for each category.                                      |          uflow-root-folder/data          |
+|           -hp           |    --high-precision    |         Whether to use high precision for computing the NFA values or not. High precision acieves slightly better performance but takes more time to execute.         |                  False                   | 
+
+Example usage for two categories:
+```bash
+python src/evaluate -cat carpet grid
+```

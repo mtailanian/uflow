@@ -173,8 +173,8 @@ if __name__ == "__main__":
     # Args
     # ------------------------------------------------------------------------------------------------------------------
     p = argparse.ArgumentParser()
-    p.add_argument("-data", "--data", default="data/mvtec", type=str)
     p.add_argument("-cat", "--categories", default=None, type=str, nargs='+')
+    p.add_argument("-data", "--data", default="data/mvtec", type=str)
     p.add_argument("-hp", "--high-precision", default=False, type=bool)
     cmd_args, _ = p.parse_known_args()
 

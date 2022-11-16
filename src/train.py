@@ -270,7 +270,7 @@ def train(args):
 
     trainer = Trainer(
         accelerator="auto",
-        devices=1 if args.device is None else [args.device],
+        devices=1,
         max_epochs=config['trainer']['epochs'] + 1,
         log_every_n_steps=10,
         callbacks=callbacks,
@@ -291,7 +291,6 @@ if __name__ == "__main__":
     p.add_argument("-config", "--config_path", default=None, type=str)
     p.add_argument("-data", "--data", default="data/mvtec", type=str)
     p.add_argument("-train_dir", "--training_dir", default="training", type=str)
-    p.add_argument("--device", type=int, default=None, help="device to use")
     cmd_args, _ = p.parse_known_args()
 
     # Execute
