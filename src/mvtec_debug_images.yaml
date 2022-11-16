@@ -1,0 +1,118 @@
+carpet:
+  test:
+    color: [8, 13, 15, 17]
+    cut: [0, 3, 4, 9]
+    hole: [1, 7, 10, 15]
+    metal_contamination: [0, 7, 13, 14]
+    thread: [1, 6, 8, 15]
+    good: [0, 1]
+grid:
+  test:
+    bent: [0, 1, 2, 3]
+    broken: [0, 1, 2, 3]
+    glue: [0, 1, 2, 3]
+    metal_contamination: [0, 1, 2, 3]
+    thread: [0, 1, 2, 3]
+    good: [0, 1]
+leather:
+  test:
+    color: [0, 1, 2, 3]
+    cut: [0, 1, 2, 3]
+    fold: [0, 1, 2, 3]
+    glue: [0, 1, 2, 3]
+    poke: [0, 1, 2, 3]
+    good: [0, 1]
+tile:
+  test:
+    crack: [0, 1, 2, 3]
+    glue_strip: [0, 1, 2, 3]
+    gray_stroke: [0, 1, 2, 3]
+    oil: [0, 1, 2, 3]
+    rough: [0, 1, 2, 3]
+    good: [0, 1]
+wood:
+  test:
+    color: [1, 2, 3, 6]
+    scratch: [0, 2, 5, 16]
+    hole: [0, 2, 4, 6]
+    liquid: [1, 2, 7, 8]
+    combined: [0, 3, 4, 7]
+    good: [0, 1]
+bottle:
+  test:
+    broken_large: [0, 1, 2, 3, 4, 5]
+    broken_small: [0, 1, 2, 3, 4, 5]
+    contamination: [0, 1, 2, 3, 4, 5]
+    good: [0, 1, 2, 3]
+cable:
+  test:
+    bent_wire: [0, 1, 2]
+    cable_swap: [0, 1, 2]
+    combined: [0, 1, 2]
+    cut_inner_insulation: [0, 1, 2]
+    cut_outer_insulation: [0, 1]
+    missing_cable: [0, 1]
+    missing_wire: [0, 1]
+    poke_insulation: [0, 1]
+    good: [0, 1]
+capsule:
+  test:
+    crack: [0, 1, 2, 3]
+    faulty_imprint: [0, 1, 2, 3]
+    poke: [0, 1, 2, 3]
+    scratch: [0, 1, 2, 3]
+    squeeze: [0, 1, 2, 3]
+    good: [0, 1]
+hazelnut:
+  test:
+    crack: [0, 1, 2, 3, 4]
+    cut: [0, 1, 2, 3, 4]
+    hole: [0, 1, 2, 3, 4]
+    print: [0, 1, 2, 3, 4]
+    good: [0, 1]
+metal_nut:
+  test:
+    bent: [0, 1, 2, 3, 4]
+    color: [0, 1, 2, 3, 4]
+    flip: [0, 1, 2, 3, 4]
+    scratch: [0, 1, 2, 3, 4]
+    good: [0, 1]
+pill:
+  test:
+    color: [0, 1, 2]
+    combined: [0, 1, 2]
+    contamination: [0, 1, 2]
+    crack: [0, 1, 2]
+    faulty_imprint: [0, 1, 2]
+    pill_type: [0, 1, 2]
+    scratch: [0, 1]
+    good: [0, 1]
+screw:
+  test:
+    manipulated_front: [0, 1, 2, 3]
+    scratch_head: [0, 1, 2, 3]
+    scratch_neck: [0, 1, 2, 3]
+    thread_side: [0, 1, 2, 3]
+    thread_top: [0, 1, 2, 3]
+    good: [0, 1]
+toothbrush:
+  test:
+    defective: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+    good: [0, 1, 2, 3]
+transistor:
+  test:
+    bent_lead: [0, 1, 2, 3, 4]
+    cut_lead: [0, 1, 2, 3, 4]
+    damaged_case: [0, 1, 2, 3, 4]
+    misplaced: [0, 1, 2, 3, 4]
+    good: [0, 1]
+zipper:
+  test:
+    broken_teeth: [0, 1, 2]
+    combined: [0, 1, 2]
+    fabric_border: [0, 1, 2]
+    fabric_interior: [0, 1, 2]
+    rough: [0, 1, 2]
+    split_teeth: [0, 1, 2]
+    squeezed_teeth: [0, 1]
+    good: [0, 1]
