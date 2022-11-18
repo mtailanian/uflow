@@ -289,7 +289,7 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("-cat", "--category", type=str, required=True)
     p.add_argument("-config", "--config_path", default=None, type=str)
-    p.add_argument("-data", "--data", default="data/mvtec", type=str)
+    p.add_argument("-data", "--data", default="data", type=str)
     p.add_argument("-train_dir", "--training_dir", default="training", type=str)
     cmd_args, _ = p.parse_known_args()
 

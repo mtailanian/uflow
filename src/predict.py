@@ -84,7 +84,7 @@ if __name__ == "__main__":
     # ------------------------------------------------------------------------------------------------------------------
     p = argparse.ArgumentParser()
     p.add_argument("-cat", "--category", default="carpet", type=str)
-    p.add_argument("-data", "--data", default="data/mvtec", type=str)
+    p.add_argument("-data", "--data", default="data", type=str)
     cmd_args, _ = p.parse_known_args()
 
     # Execute
