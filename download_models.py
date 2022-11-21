@@ -5,64 +5,64 @@ import gdown
 
 urls = {
     'bottle': {
-        'auc': '1IFXHmeFvpaXguJVVuLr9Gla7IQMInT9c',
-        'iou': '1JumC6R8OmKykjU1lFUCWp51wtpIn7pYL'
+        'auc': '1yBElaUsDq9TVxlbLixIQimvpPmXszArz',
+        'iou': '1Sa63skrhYWvzHA0G61dJcBG_F9m66ts8'
     },
     'cable': {
-        'auc': '1YuWM90eRsbKMw_c3OSlorPatVvXOBnni',
-        'iou': '1-vWmAhrl5Bq7nsfBV5vlMVc-xsyypytp'
+        'auc': '1oOM1WUmI0SrcKWz_S5WgX9eBj62gY4v3',
+        'iou': '1_2rcYyPT9PGnaUke12vTk0eBdBtNvPsZ'
     },
     'capsule': {
-        'auc': '1iXQU-bAt0fxf9HgvBdH3FcGoDCuEvfBB',
-        'iou': '1Tq3VE2J3kjdvbz0wznFjYCkF6Yd2BAB0'
+        'auc': '1IVAzH8NbLRA2h6fvjrgRM1QiQx1wrtns',
+        'iou': '1tyUYTjh9pPxL60TWv6HjVPABwpqzw-eH'
     },
     'carpet': {
-        'auc': '1YnGs9Y4dsHsDky3kx7k4xdD0d_lVMLnY',
-        'iou': '12ZgoyzBWoip1FfmuEiQc0NDweXJr5uNd'
+        'auc': '1fvT-X4FWx8XWowekFj7bVoCdkAE7MGbD',
+        'iou': '1tAolF8Krtw6y-EASgLrrX6MBDckPblwC'
     },
     'grid': {
-        'auc': '1veUuiCoqu0BM1vXd0lKmQT8ehEg2peO0',
-        'iou': '1EabUFvtSaVMGdwNWMCT0YhZg9EKhm-tc'
+        'auc': '1sQCm2sxYaooYh2jBQw3EZw8HgaDmvKlp',
+        'iou': '1MlrtwTJ91kFrOoLWW6ZaqNaBgVJEN0fd'
     },
     'hazelnut': {
-        'auc': '1oeJYAYZTGf4g1lV4fGe3S91BqtjDE13u',
-        'iou': '1DSgXF6PE-Yqjs_norDblFZw2JGv88EsS'
+        'auc': '1pqHLwZ2MRLEBjMCNRPy3nOLhS0YZ_1lu',
+        'iou': '1RDnsHtVmrP6Xw6soXFYnKJmoeRi2iBsq'
     },
     'leather': {
-        'auc': '1wHK3VpV_6_z1_YvEpoe_-h1tRN9rBmwc',
-        'iou': '1n5JmX7L_H3XJ9i2FXKA9rlPoj7ag2bsE'
+        'auc': '1yjh_7vSC44bc9fxbUmWKRTlKeipfeb6r',
+        'iou': '1RDnsHtVmrP6Xw6soXFYnKJmoeRi2iBsq'
     },
     'metal_nut': {
-        'auc': '1-l2_ivF_-0n6Jb2qMGCePYbeVSb_EWQ1',
-        'iou': '17GoHuUcQxSiHNEgHSsApSOru9H80IYQb'
+        'auc': '1IKXy7WpeMnV4gfK4GZIYVww_RVHYLV_x',
+        'iou': '1BpkFO7PPq6xYGbxJS2Rs6N-sPXYX-lTA'
     },
     'pill': {
-        'auc': '1atPD3w94pH704YajhdtpMSmmw9kCK1ER',
-        'iou': '1I4Tic_Vc3LF_G4akHdihEdF_2N5HMytL'
+        'auc': '1B9UxInnrv2OsToUW94ocvhZr8ZbLJcO-',
+        'iou': '1PeAcmhXnUsRf2ALAoSqxQQobbDB2aRWf'
     },
     'screw': {
-        'auc': '1Foe4OEb6PMEe1y4PG1lZZBlg4HW-k6Z-',
-        'iou': '1DZSRPcq6UrAWNDu0dLGEWqdGak0t2PKo'
+        'auc': '1h2uGLVFkXMJETsmVqfReooml6nKOZHMJ',
+        'iou': '1z02h-hmUe3mgHWuSApj9mWIizMZuxp1f'
     },
     'tile': {
-        'auc': '13xrYYa3b7B1HfaEwVYr2-qgCwzYSrOQx',
-        'iou': '1VbaAIw_6NSKIv1fmrylBmJ9nFhi-rmHq'
+        'auc': '1QWSvhtVfk1b_pOhaIFKE6rKSnAMhhG9H',
+        'iou': '1rs8Agv6CM2uzm7M7i96EQgAKwQW9QnDX'
     },
     'toothbrush': {
-        'auc': '1SeBT18OXfewtsoEPz6OA9Jn5OLKSGdQz',
-        'iou': '1VnDh96vUtYjQh35lF0AHyRXJaiTKSHh7'
+        'auc': '1bCIKvCeU45dinzvGZPOpn7Jgf3LVkkwS',
+        'iou': '1YxQG1oHhhAsZuRgTxCqjZ6ELNFpjRpnN'
     },
     'transistor': {
-        'auc': '1jpDF_iwemef8t31G33VpH8vox39vFBH1',
-        'iou': '1xiRYOcbaZQhhh4N19l5m7PCdWHA7PKNk'
+        'auc': '1I8yeuTpUJPNHy0ToY8ZM3qv-Y4VFKOr2',
+        'iou': '11IxXg95xB_b5UAVKdFs6cO0kDJNK6i8T'
     },
     'wood': {
-        'auc': '14YSNRn0O16L4xUf-L0uo3aK79PMX_fn3',
-        'iou': '1aa3ZjUT1vBhsH5nRd_-TyJdZzYBfA_Ks'
+        'auc': '10W39Zk6c2MKb4CLgx9ksco1GfqC4m8JS',
+        'iou': '158HrCMoQi8Z7lTxpOY3HzLRzfB3FzieS'
     },
     'zipper': {
-        'auc': '10C7I9ehU28Vqj5-mLXKK81_p6L1g4bbc',
-        'iou': '1QpPF8oPUtL1UnQVrRoCW-T3i2pAZCWcF'
+        'auc': '1zbISk4lD5FUr0B5hE1zOw9_GwzaGofp5',
+        'iou': '1lR3GiO7IrkaP8JL2DoXIbUHjaaOugqrA'
     }
 }
 

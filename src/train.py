@@ -18,7 +18,6 @@ from pytorch_lightning.callbacks import LearningRateMonitor, EarlyStopping
 
 from src.iou import IoU
 from src.model import UFlow
-from src.utils import get_training_dir
 from src.nfa import compute_log_nfa_anomaly_score
 from src.datamodule import MVTecLightningDatamodule, mvtec_un_normalize, get_debug_images_paths
 from src.callbacks import MyPrintingCallback, ModelCheckpointByAuROC, ModelCheckpointByIoU, ModelCheckpointByInterval
@@ -218,6 +217,15 @@ class UFlowTrainer(LightningModule):
             optimizer, start_factor=1., end_factor=0.4, total_iters=get_total_number_of_iterations()
         )
         return [optimizer], [scheduler]
+
+
+def get_training_dir(base_dir, prefix="exp_"):
+    out_path = Path(base_dir)
+    previous_experiments = [int(l.stem.split('_')[1]) for l in out_path.glob(f'{prefix}*')]
+    last_experiment = max(previous_experiments) if len(previous_experiments) > 0 else 0
+    out_path = out_path / f"{prefix}{last_experiment + 1:04d}"
+    out_path.mkdir(exist_ok=True, parents=True)
+    return out_path
 
 
 def train(args):
