@@ -8,8 +8,7 @@
 
 ### Link to download paper:
 
-TODO: UPDATE!
-[![Arxiv](https://img.shields.io/badge/arXiv-2110.02407-red.svg)](https://arxiv.org/abs/2110.02407)
+[![Arxiv](https://img.shields.io/badge/arXiv-2110.02407-red.svg)](https://arxiv.org/abs/2211.12353)
  
 </div>
 
