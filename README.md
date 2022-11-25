@@ -233,13 +233,11 @@ Normalizing Flow outputs
 TODO: complete
 
 ```
-@inproceedings{tailanian2022uflow,
-  title={U-Flow: A U-shaped Normalizing Flow for Anomaly Detection with Unsupervised Threshold.},
-  author={Tailani{\'a}n, Mat{\'\i}as and Pardo, {\'A}lvaro} and Mus{\'e}, Pablo,
-  booktitle={},
-  pages={},
-  year={2022},
-  organization={}
+@article{tailanian2022u,
+  title={U-Flow: A U-shaped Normalizing Flow for Anomaly Detection with Unsupervised Threshold},
+  author={Tailanian, Mat{\'\i}as and Pardo, {\'A}lvaro and Mus{\'e}, Pablo},
+  journal={arXiv preprint arXiv:2211.12353},
+  year={2022}
 }
 ```
 
