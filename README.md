@@ -20,7 +20,10 @@ This is the official code that implements the paper **U-Flow: A U-shaped Normali
 
 _In this work we propose a non-contrastive method for anomaly detection and segmentation in images, that benefits both from a modern machine learning approach and a more classic statistical detection theory. The method consists of three phases. First, features are extracted using a multi-scale image Transformer architecture. Then, these features are fed into a U-shaped Normalizing Flow that lays the theoretical foundations for the last phase, which computes a pixel-level anomaly map, and performs a segmentation based on the a contrario framework. This multiple-hypothesis testing strategy permits to derive robust automatic detection thresholds, which are crucial in many real-world applications, where an operational point is needed. The segmentation results are evaluated using the Intersection over Union (IoU) metric; and for assessing the generated anomaly maps we report the area under the Receiver Operating Characteristic curve (AUROC), and the area under the per-region-overlap curve (AUPRO). Extensive experimentation in various datasets shows that the proposed approach produces state-of-the-art results for all metrics and all datasets, ranking first in most MvTec-AD categories, with a mean pixel-level AUROC of 98.74%._ 
 
-![text](assets/teaser.jpg?raw=true)
+<div style="text-align: center;" markdown="1">
+<img src="assets/teaser.jpg" alt="drawing" width="70%"/>
+</div>
+
 ## Localization results
 ### Pixel AUROC over MVTec-AD Dataset
 
@@ -29,19 +32,19 @@ _In this work we propose a non-contrastive method for anomaly detection and segm
 ### Pixel AUPRO over MVTec-AD Dataset
 
 <div style="text-align: center;" markdown="1">
-<img src="assets/pixel-aupro.png" alt="drawing" width="70%"/>
+<img src="assets/pixel-aupro.png" alt="drawing" width="50%"/>
 </div>
 
 ## Segmentation results (IoU) with threshold log(NFA)=0
 
 <div style="text-align: center;" markdown="1">
-<img src="assets/iou.png" alt="drawing" width="70%"/>
+<img src="assets/iou.png" alt="drawing" width="50%"/>
 </div>
 
  ## Results over other datasets
 
 <div style="text-align: center;" markdown="1">
-<img src="assets/more-results.png" alt="drawing" width="70%"/>
+<img src="assets/more-results.png" alt="drawing" width="50%"/>
 </div>
 
 ## Setup
