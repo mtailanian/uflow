@@ -18,19 +18,32 @@ This is the official code that implements the paper **U-Flow: A U-shaped Normali
 
 ## Abstract   
 
-_In this work we propose a non-contrastive method for anomaly detection and segmentation in images, that benefits both from a modern machine learning approach and a more classic statistical detection theory. The method consists of three phases. First, features are extracted by making use of a multi-scale image Transformer architecture. Then, these features are fed into a U-shaped Normalizing Flow that lays the theoretical foundations for the last phase, which computes a pixel-level anomaly map, and performs a segmentation based on the a contrario framework. This multiple hypothesis testing strategy permits to derive a robust automatic detection threshold, which is key in many real-world applications, where an operational point is needed. The segmentation results are evaluated using the Intersection over Union (IoU) metric, and for assessing the generated anomaly maps we report the area under the Receiver Operating Characteristic curve (ROC-AUC) at both image and pixel level. For both metrics, the proposed approach produces state-of-the-art results, ranking first in most MvTec-AD categories, with a mean pixel-level ROC-AUC of 98.74%._ 
+_In this work we propose a non-contrastive method for anomaly detection and segmentation in images, that benefits both from a modern machine learning approach and a more classic statistical detection theory. The method consists of three phases. First, features are extracted using a multi-scale image Transformer architecture. Then, these features are fed into a U-shaped Normalizing Flow that lays the theoretical foundations for the last phase, which computes a pixel-level anomaly map, and performs a segmentation based on the a contrario framework. This multiple-hypothesis testing strategy permits to derive robust automatic detection thresholds, which are crucial in many real-world applications, where an operational point is needed. The segmentation results are evaluated using the Intersection over Union (IoU) metric; and for assessing the generated anomaly maps we report the area under the Receiver Operating Characteristic curve (AUROC), and the area under the per-region-overlap curve (AUPRO). Extensive experimentation in various datasets shows that the proposed approach produces state-of-the-art results for all metrics and all datasets, ranking first in most MvTec-AD categories, with a mean pixel-level AUROC of 98.74%._ 
 
-### Anomaly localization results (pixel ROC-AUC) over MVTec-AD Dataset
+![text](assets/teaser.jpg?raw=true)
+## Localization results
+### Pixel AUROC over MVTec-AD Dataset
 
-![text](assets/pixel-auc.png?raw=true)
+![text](assets/pixel-auroc.png?raw=true)
 
-### Segmentation results (IoU) with threshold log(NFA)=0
+### Pixel AUPRO over MVTec-AD Dataset
 
 <div style="text-align: center;" markdown="1">
-<img src="assets/iou.png" alt="drawing" width="50%"/>
+<img src="assets/pixel-aupro.png" alt="drawing" width="70%"/>
 </div>
 
- 
+## Segmentation results (IoU) with threshold log(NFA)=0
+
+<div style="text-align: center;" markdown="1">
+<img src="assets/iou.png" alt="drawing" width="70%"/>
+</div>
+
+ ## Results over other datasets
+
+<div style="text-align: center;" markdown="1">
+<img src="assets/more-results.png" alt="drawing" width="70%"/>
+</div>
+
 ## Setup
 
 Creating virtual environment and installing dependencies   
@@ -48,6 +61,9 @@ pip install -r requirements.txt
  ```   
 
 ## Download data
+
+### MVTec
+
 To download MvTec AD dataset please enter the root directory and execute the following
 ```bash
 cd <uflow-root>/data
@@ -76,6 +92,18 @@ Object categories
 [toothbrush](https://www.mydrive.ch/shares/38536/3830184030e49fe74747669442f0f282/download/420938134-1629953256/toothbrush.tar.xz), 
 [transistor](https://www.mydrive.ch/shares/38536/3830184030e49fe74747669442f0f282/download/420938166-1629953277/transistor.tar.xz), 
 [zipper](https://www.mydrive.ch/shares/38536/3830184030e49fe74747669442f0f282/download/420938385-1629953449/zipper.tar.xz), 
+
+### Bean Tech
+
+https://paperswithcode.com/dataset/btad
+
+### LGG MRI
+
+https://www.kaggle.com/datasets/mateuszbuda/lgg-mri-segmentation
+
+### ShanghaiTech Campus
+
+https://svip-lab.github.io/dataset/campus_dataset.html
 
 ## [Optional] Download pre-trained models
 
@@ -226,9 +254,24 @@ Normalizing Flow outputs
 
 `/ 2` corresponds to the split, and `/ 4` to the invertible upsample.
 
+## Example results
 
+### Anomalies
+#### MVTec
+![text](assets/results-mvtec-anomalies.jpg?raw=true)
 
-### Citation
+#### BeanTech, LGG MRI, STC
+![text](assets/results-others-anomalies.jpg?raw=true)
+
+### Normal images
+
+#### MVTec
+![text](assets/results-mvtec-good.jpg?raw=true)
+
+#### BeanTech, LGG MRI, STC
+![text](assets/results-others-good.jpg?raw=true)
+
+## Citation
 
 TODO: complete
 
