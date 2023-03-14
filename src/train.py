@@ -17,6 +17,7 @@ from torchvision import transforms
 from pytorch_lightning.callbacks import LearningRateMonitor, EarlyStopping
 
 from src.iou import IoU
+from src.aupro import AUPRO
 from src.model import UFlow
 from src.nfa import compute_log_nfa_anomaly_score
 from src.datamodule import MVTecLightningDatamodule, mvtec_un_normalize, get_debug_images_paths
@@ -64,6 +65,7 @@ class UFlowTrainer(LightningModule):
 
         # Metrics
         self.pixel_auroc = metrics.ROC_AUC()
+        self.pixel_aupro = AUPRO()
         self.image_auroc = metrics.ROC_AUC()
         self.iou_lnfa0 = IoU(thresholds=[0])
 
@@ -132,6 +134,7 @@ class UFlowTrainer(LightningModule):
             lnfa = compute_log_nfa_anomaly_score(z, win_size=5, binomial_probability_thr=0.9, high_precision=False)
             resized_targets = 1 * (self.debug_img_resizer(targets) > 0.5)
             self.pixel_auroc.update((anomaly_score.ravel(), resized_targets.ravel()))
+            self.pixel_aupro.update(anomaly_score, resized_targets)
             self.iou_lnfa0.update(lnfa.detach().cpu(), resized_targets.cpu())
 
             # Image level metric
@@ -144,18 +147,21 @@ class UFlowTrainer(LightningModule):
         if self.current_epoch % self.log_every_n_epochs == 0:
             # Compute metrics
             pixel_auroc = float(self.pixel_auroc.compute())
+            pixel_aupro = float(self.pixel_aupro.compute())
             image_auroc = float(self.image_auroc.compute())
             pixel_iou = float(self.iou_lnfa0.compute().numpy())
             self.log_dict(
-                {'pixel_auroc': pixel_auroc, 'image_auroc': image_auroc, 'iou': pixel_iou},
+                {'pixel_auroc': pixel_auroc, 'pixel_aupro': pixel_aupro, 'image_auroc': image_auroc, 'iou': pixel_iou},
                 on_step=False, on_epoch=True, prog_bar=False, logger=True
             )
 
             self.pixel_auroc.reset()
+            self.pixel_aupro.reset()
             self.image_auroc.reset()
             self.iou_lnfa0.reset()
 
             self.logger.experiment.add_scalar("03_ValidationMetrics/PixelAuROC", pixel_auroc, self.current_epoch)
+            self.logger.experiment.add_scalar("03_ValidationMetrics/PixelAuPRO", pixel_aupro, self.current_epoch)
             self.logger.experiment.add_scalar("03_ValidationMetrics/ImageAuROC", image_auroc, self.current_epoch)
             self.logger.experiment.add_scalar("03_ValidationMetrics/PixelIoU", pixel_iou, self.current_epoch)
 

@@ -16,6 +16,7 @@ from tqdm import tqdm
 from src.model import UFlow
 from src.datamodule import MVTecLightningDatamodule
 from src.iou import IoU
+from src.aupro import AUPRO
 from src.nfa import compute_log_nfa_anomaly_score
 
 warnings.filterwarnings("ignore", category=UndefinedMetricWarning)
@@ -63,6 +64,11 @@ def reproduce_results(args):
         flow_model.eval()
         eval_auroc(flow_model, datamodule.val_dataloader(), TARGET_SIZE)
 
+        # Aupro
+        flow_model.from_pretrained(Path("models") / "pro" / f"{category}.ckpt")
+        flow_model.eval()
+        eval_aupro(flow_model, datamodule.val_dataloader(), TARGET_SIZE)
+
         # IoU
         flow_model.from_pretrained(Path("models") / "iou" / f"{category}.ckpt")
         flow_model.eval()
@@ -97,6 +103,32 @@ def eval_auroc(model, dataloader, target_size: Union[None, int] = None):
         auroc.update((anomaly_score.ravel(), targets.ravel()))
 
     print(f"\t\tAUROC: {auroc.compute()}")
+
+
+def eval_aupro(model, dataloader, target_size: Union[None, int] = None):
+
+    if target_size is None:
+        target_size = model.input_size
+
+    model = model.to(DEVICE)
+
+    aupro = AUPRO()
+
+    progress_bar = tqdm(dataloader)
+    progress_bar.set_description("\tComputing AuPRO")
+    for images, targets, img_paths in progress_bar:
+        with torch.no_grad():
+            z, _ = model.forward(images.to(DEVICE))
+
+        anomaly_score = 1 - model.get_probability(z, target_size)
+
+        if targets.shape[-1] != target_size:
+            targets = F.interpolate(targets, size=[target_size, target_size], mode="bilinear", align_corners=False)
+        targets = 1 * (targets > 0.5)
+
+        aupro.update(anomaly_score, targets.to(DEVICE))
+
+    print(f"\t\tAUPRO: {aupro.compute()}")
 
 
 def eval_iou(model, datamodule, target_size: Union[None, int] = None, high_precision: bool = False):

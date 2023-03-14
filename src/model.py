@@ -111,4 +111,14 @@ class UFlow(pl.LightningModule):
     def from_pretrained(self, ckpt_path):
         state_dict = torch.load(ckpt_path, map_location=torch.device('cpu'))["state_dict"]
         state_dict = collections.OrderedDict({k.split("model.")[-1]: v for k, v in state_dict.items()})
+
+        for k in [k for k in state_dict.keys() if 'log_loss_weights' in k]:
+            del state_dict[k]
+        for k in [k for k in state_dict.keys() if 'aupro' in k]:
+            del state_dict[k]
+        for k in [k for k in state_dict.keys() if 'f1' in k]:
+            del state_dict[k]
+        for k in [k for k in state_dict.keys() if 'mcc' in k]:
+            del state_dict[k]
+
         self.load_state_dict(state_dict)
