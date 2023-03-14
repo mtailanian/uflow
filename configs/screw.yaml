@@ -3,7 +3,7 @@ model:
   flow_steps: 4
   backbone: "mcait"  # resnet18, wide_resnet50_2
 trainer:
-  epochs: 200
+  epochs: 500
   batch_train: 11
   batch_val: 5
   learning_rate: 0.0004155987052838602
