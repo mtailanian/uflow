@@ -15,9 +15,10 @@ from tqdm import tqdm
 
 from src.model import UFlow
 from src.datamodule import MVTecLightningDatamodule
-from src.iou import IoU
+from src.miou import mIoU
 from src.aupro import AUPRO
-from src.nfa import compute_log_nfa_anomaly_score
+from src.nfa_block import compute_log_nfa_anomaly_score
+from src.nfa_tree import compute_nfa_anomaly_score_tree
 
 warnings.filterwarnings("ignore", category=UndefinedMetricWarning)
 
@@ -72,11 +73,10 @@ def reproduce_results(args):
         # IoU
         flow_model.from_pretrained(Path("models") / "iou" / f"{category}.ckpt")
         flow_model.eval()
-        eval_iou(
+        eval_miou(
             flow_model,
             datamodule,
-            target_size=TARGET_SIZE,
-            high_precision=args.high_precision
+            target_size=TARGET_SIZE
         )
 
 
@@ -131,18 +131,18 @@ def eval_aupro(model, dataloader, target_size: Union[None, int] = None):
     print(f"\t\tAUPRO: {aupro.compute()}")
 
 
-def eval_iou(model, datamodule, target_size: Union[None, int] = None, high_precision: bool = False):
+def eval_miou(model, datamodule, target_size: Union[None, int] = None):
 
     if target_size is None:
         target_size = model.input_size
 
     model = model.to(DEVICE)
 
-    fair_likelihood_thr = get_fair_threshold(model, datamodule.train_dataloader(), TARGET_FPR, target_size)
-    nfa_thresholds = list(np.arange(-2, 2, 0.05))
+    # This would be the code for computing the fair threshold for the case when we do not have an automatic threshold
+    # fair_likelihood_thr = get_fair_threshold(model, datamodule.train_dataloader(), TARGET_FPR, target_size)
 
-    iou_likelihood = IoU(thresholds=[fair_likelihood_thr])
-    iou_nfa = IoU(thresholds=nfa_thresholds)
+    nfa_thresholds = list(np.arange(-200, 1001, 20))
+    miou_metric = mIoU(thresholds=nfa_thresholds)
 
     progress_bar = tqdm(datamodule.val_dataloader())
     progress_bar.set_description("\tComputing IoU")
@@ -152,28 +152,43 @@ def eval_iou(model, datamodule, target_size: Union[None, int] = None, high_preci
         with torch.no_grad():
             z, _ = model(image)
 
-        anomaly_score_likelihood = 1 - model.get_probability(z, target_size)
-        anomaly_score_nfa = compute_log_nfa_anomaly_score(
-            z, win_size=5, binomial_probability_thr=0.9, high_precision=high_precision
-        )
+        anomaly_score = compute_nfa_anomaly_score_tree(z, target_size=target_size)
+
+        # Alternative old computation -------------------------------------------
+        block_nfa = False
+        if block_nfa:
+            anomaly_score = compute_log_nfa_anomaly_score(z, high_precision=True)
+        # -----------------------------------------------------------------------
 
         if targets.shape[-1] != target_size:
             targets = F.interpolate(targets, size=[target_size, target_size], mode="bilinear", align_corners=False)
             targets = 1 * (targets > 0.5)
 
-        iou_likelihood.update(anomaly_score_likelihood.detach().cpu(), targets.cpu())
-        iou_nfa.update(anomaly_score_nfa.detach().cpu(), targets.cpu())
+        miou_metric.update(anomaly_score.detach().cpu(), targets.cpu())
 
-    iou_fair = iou_likelihood.compute().numpy()
-    iou_nfas = iou_nfa.compute().numpy()
+    mious = miou_metric.compute().numpy()
 
-    print(f"\t\tIoU @ log(NFA)=0: {iou_nfas[list(np.around(nfa_thresholds, 2)).index(0)]}")
-    print(f"\t\tIoU @ oracle-thr: {np.max(iou_nfas)}")
-    print(f"\t\tIoU @ fair-thr  : {iou_fair}")
+    print(f"\t\tmIoU @ log(NFA)=0: {mious[list(np.around(nfa_thresholds, 2)).index(0)]}")
+    print(f"\t\tmIoU @ oracle-thr: {np.max(mious)}")
 
 
 def get_fair_threshold(model, dataloader, target_fpr=0.01, target_size=None):
+    """
+    This is the code used for computing the fair threshold over the likelihoods for the case when we do not have an
+    automatic thresholds (i.e. we do not have the NFA). This method was used for computing the fair threshold for all
+    competitors in the paper. It mimics the same rationale of the NFA, allowing at most one false positive per image on
+    average. as explained in the paper, or this computation only the anomaly free images are used.
+    Parameters
+    ----------
+    model:
+    dataloader
+    target_fpr
+    target_size
 
+    Returns
+    -------
+    The fair threshold, i.e. the threshold that allows at most one false positive per image on average.
+    """
     if target_size is None:
         target_size = model.input_size
 

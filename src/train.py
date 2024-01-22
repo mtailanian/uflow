@@ -16,12 +16,12 @@ from torchvision.utils import make_grid
 from torchvision import transforms
 from pytorch_lightning.callbacks import LearningRateMonitor, EarlyStopping
 
-from src.iou import IoU
+from src.miou import mIoU
 from src.aupro import AUPRO
 from src.model import UFlow
-from src.nfa import compute_log_nfa_anomaly_score
+from src.nfa_tree import compute_nfa_anomaly_score_tree
 from src.datamodule import MVTecLightningDatamodule, mvtec_un_normalize, get_debug_images_paths
-from src.callbacks import MyPrintingCallback, ModelCheckpointByAuROC, ModelCheckpointByIoU, ModelCheckpointByInterval
+from src.callbacks import MyPrintingCallback, ModelCheckpointByAuROC, ModelCheckpointBymIoU, ModelCheckpointByInterval
 
 warnings.filterwarnings("ignore", category=UserWarning, message="Your val_dataloader has `shuffle=True`")
 warnings.filterwarnings("ignore", category=UserWarning, message="Checkpoint directory .* exists and is not empty")
@@ -67,7 +67,7 @@ class UFlowTrainer(LightningModule):
         self.pixel_auroc = metrics.ROC_AUC()
         self.pixel_aupro = AUPRO()
         self.image_auroc = metrics.ROC_AUC()
-        self.iou_lnfa0 = IoU(thresholds=[0])
+        self.miou_lnfa0 = mIoU(thresholds=[0])
 
         # Debug images
         self.test_images = None
@@ -77,7 +77,7 @@ class UFlowTrainer(LightningModule):
         z, ljd = self.model(batch)
 
         # Compute loss
-        lpz = torch.sum(torch.stack([0.5 * torch.sum(z_i ** 2, dim=(1, 2, 3)) for z_i in z], dim=0))
+        lpz = torch.sum(torch.stack([0.5 * torch.sum(z_i ** 2, dim=(1, 2, 3)) for z_i in z]), dim=0)
         flow_loss = torch.mean(lpz - ljd)
 
         return {"01_Train/Loss": flow_loss.detach(), "loss": flow_loss}
@@ -131,11 +131,11 @@ class UFlowTrainer(LightningModule):
 
             # Pixel level metrics
             anomaly_score = 1 - self.model.get_probability(z, self.debug_img_size)
-            lnfa = compute_log_nfa_anomaly_score(z, win_size=5, binomial_probability_thr=0.9, high_precision=False)
+            lnfa = compute_nfa_anomaly_score_tree(z, self.debug_img_size)
             resized_targets = 1 * (self.debug_img_resizer(targets) > 0.5)
             self.pixel_auroc.update((anomaly_score.ravel(), resized_targets.ravel()))
             self.pixel_aupro.update(anomaly_score, resized_targets)
-            self.iou_lnfa0.update(lnfa.detach().cpu(), resized_targets.cpu())
+            self.miou_lnfa0.update(lnfa.detach().cpu(), resized_targets.cpu())
 
             # Image level metric
             image_targets = torch.IntTensor([0 if 'good' in p else 1 for p in paths])
@@ -149,21 +149,21 @@ class UFlowTrainer(LightningModule):
             pixel_auroc = float(self.pixel_auroc.compute())
             pixel_aupro = float(self.pixel_aupro.compute())
             image_auroc = float(self.image_auroc.compute())
-            pixel_iou = float(self.iou_lnfa0.compute().numpy())
+            pixel_miou = float(self.miou_lnfa0.compute().numpy())
             self.log_dict(
-                {'pixel_auroc': pixel_auroc, 'pixel_aupro': pixel_aupro, 'image_auroc': image_auroc, 'iou': pixel_iou},
+                {'pixel_auroc': pixel_auroc, 'pixel_aupro': pixel_aupro, 'image_auroc': image_auroc, 'miou': pixel_miou},
                 on_step=False, on_epoch=True, prog_bar=False, logger=True
             )
 
             self.pixel_auroc.reset()
             self.pixel_aupro.reset()
             self.image_auroc.reset()
-            self.iou_lnfa0.reset()
+            self.miou_lnfa0.reset()
 
             self.logger.experiment.add_scalar("03_ValidationMetrics/PixelAuROC", pixel_auroc, self.current_epoch)
             self.logger.experiment.add_scalar("03_ValidationMetrics/PixelAuPRO", pixel_aupro, self.current_epoch)
             self.logger.experiment.add_scalar("03_ValidationMetrics/ImageAuROC", image_auroc, self.current_epoch)
-            self.logger.experiment.add_scalar("03_ValidationMetrics/PixelIoU", pixel_iou, self.current_epoch)
+            self.logger.experiment.add_scalar("03_ValidationMetrics/PixelmIoU", pixel_miou, self.current_epoch)
 
         # Log example images
         if self.current_epoch % self.save_debug_images_every == 0:
@@ -270,7 +270,7 @@ def train(args):
     callbacks = [
         MyPrintingCallback(),
         ModelCheckpointByAuROC(training_dir),
-        ModelCheckpointByIoU(training_dir),
+        ModelCheckpointBymIoU(training_dir),
         # ModelCheckpointByInterval(training_dir, config['trainer']['save_ckpt_every']),
         LearningRateMonitor('epoch'),
         EarlyStopping(

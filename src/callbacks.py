@@ -20,13 +20,13 @@ class ModelCheckpointByAuROC(ModelCheckpoint):
         )
 
 
-class ModelCheckpointByIoU(ModelCheckpoint):
+class ModelCheckpointBymIoU(ModelCheckpoint):
     def __init__(self, experiment_path):
-        super(ModelCheckpointByIoU, self).__init__(
-            monitor='iou',
+        super(ModelCheckpointBymIoU, self).__init__(
+            monitor='miou',
             dirpath=str(experiment_path),
             mode='max',
-            filename='best_val_iou_nfa__epoch_{epoch:04d}__iou_{iou:.4f}',
+            filename='best_val_miou_nfa__epoch_{epoch:04d}__miou_{miou:.4f}',
             auto_insert_metric_name=False,
         )
 

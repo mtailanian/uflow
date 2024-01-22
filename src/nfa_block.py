@@ -12,8 +12,8 @@ mp.dps = 15
 
 def compute_log_nfa_anomaly_score(
         z: List[torch.Tensor],
-        win_size: int = 7,
-        binomial_probability_thr: float = 0.5,
+        win_size: int = 5,
+        binomial_probability_thr: float = 0.9,
         target_size: int = 256,
         high_precision: bool = False
 ):
