@@ -8,7 +8,8 @@
 
 ### Link to download paper:
 
-[![Arxiv](https://img.shields.io/badge/arXiv-2110.02407-red.svg)](https://arxiv.org/abs/2211.12353)
+[![JMIV](https://img.shields.io/badge/JMIV-UFlow-yellow.svg?style=for-the-badge)]()
+[![Arxiv](https://img.shields.io/badge/arXiv-2110.02407-blue.svg?style=for-the-badge)](https://arxiv.org/abs/2211.12353)
  
 </div>
 
@@ -18,10 +19,11 @@ This is the official code that implements the paper **U-Flow: A U-shaped Normali
 
 ## Abstract   
 
-_In this work we propose a non-contrastive method for anomaly detection and segmentation in images, that benefits both from a modern machine learning approach and a more classic statistical detection theory. The method consists of three phases. First, features are extracted using a multi-scale image Transformer architecture. Then, these features are fed into a U-shaped Normalizing Flow that lays the theoretical foundations for the last phase, which computes a pixel-level anomaly map, and performs a segmentation based on the a contrario framework. This multiple-hypothesis testing strategy permits to derive robust automatic detection thresholds, which are crucial in many real-world applications, where an operational point is needed. The segmentation results are evaluated using the Intersection over Union (IoU) metric; and for assessing the generated anomaly maps we report the area under the Receiver Operating Characteristic curve (AUROC), and the area under the per-region-overlap curve (AUPRO). Extensive experimentation in various datasets shows that the proposed approach produces state-of-the-art results for all metrics and all datasets, ranking first in most MvTec-AD categories, with a mean pixel-level AUROC of 98.74%._ 
+_In this work we propose a one-class self-supervised method for anomaly segmentation in images that benefits both from a modern machine learning approach and a more classic statistical detection theory. The method consists of four phases. First, features are extracted using a multi-scale image Transformer architecture. Then, these features are fed into a U-shaped Normalizing Flow (NF) that lays the theoretical foundations for the subsequent phases. The third phase computes a pixel-level anomaly map from the NF embedding, and the last phase performs a segmentation based on the a contrario framework. This multiple-hypothesis testing strategy permits the derivation of robust unsupervised detection thresholds, which are crucial in real-world applications where an operational point is needed. The segmentation results are evaluated using the Mean Intersection over Union (mIoU ) metric, and for assessing the generated anomaly maps we report the area under the Receiver Operating Characteristic curve (AUROC), as well as the Area Under the Per-Region-Overlap curve (AUPRO). Extensive experimentation in various datasets shows that the proposed approach produces state-of-the-art results for all metrics and all datasets, ranking first in most MVTec-AD categories, with a mean pixel-level AUROC of 98.74%._
+_Code and trained models are available at https://github.com/mtailanian/uflow._
 
 <div style="text-align: center;" markdown="1">
-<img src="assets/teaser.jpg" alt="drawing" width="70%"/>
+<img src="assets/teaser.png" alt="drawing" width="70%"/>
 </div>
 
 ## Localization results
@@ -35,16 +37,20 @@ _In this work we propose a non-contrastive method for anomaly detection and segm
 <img src="assets/pixel-aupro.png" alt="drawing" width="50%"/>
 </div>
 
-## Segmentation results (IoU) with threshold log(NFA)=0
+## Segmentation results (mIoU) with threshold log(NFA)=0
 
 <div style="text-align: center;" markdown="1">
-<img src="assets/iou.png" alt="drawing" width="50%"/>
+<img src="assets/miou.png" alt="drawing" width="100%"/>
 </div>
 
  ## Results over other datasets
 
 <div style="text-align: center;" markdown="1">
-<img src="assets/more-results.png" alt="drawing" width="50%"/>
+<img src="assets/more-results-1.png" alt="drawing" width="100%"/>
+</div>
+
+<div style="text-align: center;" markdown="1">
+<img src="assets/more-results-2.png" alt="drawing" width="100%"/>
 </div>
 
 ## Setup
@@ -108,7 +114,7 @@ https://www.kaggle.com/datasets/mateuszbuda/lgg-mri-segmentation
 
 https://svip-lab.github.io/dataset/campus_dataset.html
 
-## [Optional] Download pre-trained models
+## [Optional] Download pre-trained models - Option 1
 
 If you are to reproduce the paper results, you could download the pre-trained models that were used to obtain the actual results, or you can even train a model with the provided code (explained in next section).
 For downloading the pre-trained models, go to project root directory and execute the `download_models.py` script in the following way:
@@ -160,6 +166,10 @@ Sometimes, when attempting to download files too frequently, `gdown` gives an er
 **In that case there are two options: wait a couple of hours (probably 24 hours), or download by hand by entering to [this url](https://drive.google.com/drive/folders/1W1rE0mu4Lv3uWHA5GZigmvVNlBVHqTv_?usp=sharing)**.
 
 If downloading by hand please remember to use the same folder's structure as in Google Drive, inside the `<uflow-root>/models` directory.
+
+## [Optional] Download pre-trained models - Option 2
+
+Pre-trained models for MVTec can also be found in [this release](https://github.com/mtailanian/uflow/tree/main/configs)
 
 ## Execution
 
