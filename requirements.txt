@@ -1,14 +1,18 @@
-pytorch-lightning
-pytorch-ignite
-timm==0.6.7
-numpy==1.23.4
-matplotlib==3.4.3
-scipy==1.9.3
+--extra-index-url https://download.pytorch.org/whl/cu118
+torch==2.3.0
+torchvision==0.18.0
+lightning==2.2.4
+pytorch-ignite==0.5.0.post2
+timm==0.9.16
+numpy==1.26.4
+matplotlib==3.8.4
+scipy==1.13.0
 FrEIA @ git+https://github.com/VLL-HD/FrEIA@1779d1fba1e21000fda1927b59eeac0a6fcaa284
-mpmath==1.2.1
-scikit-learn==1.1.1
-tensorboard==2.11.0
-pyyaml==6.0
+mpmath==1.3.0
+scikit-learn==1.4.2
+tensorboard==2.16.2
+pyyaml==6.0.1
 gdown==4.5.3
-scikit-image==0.21.0
-networkx==3.1
+scikit-image==0.23.2
+networkx==3.3
+opencv-python==4.9.0.80

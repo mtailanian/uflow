@@ -1,14 +1,14 @@
 import collections
 import torch
 import torch.nn as nn
-import pytorch_lightning as pl
+import lightning as L
 import torch.nn.functional as F
 from FrEIA import framework as ff, modules as fm
 
 from src.feature_extraction import get_feature_extractor
 
 
-class UFlow(pl.LightningModule):
+class UFlow(L.LightningModule):
     def __init__(self, input_size=256, flow_steps=8, backbone="mcait"):
         super(UFlow, self).__init__()
         self.input_size = input_size

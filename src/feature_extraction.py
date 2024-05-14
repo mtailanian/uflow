@@ -1,4 +1,4 @@
-import pytorch_lightning as pl
+import lightning as L
 import timm
 import torch
 import torch.nn as nn
@@ -16,7 +16,7 @@ def get_feature_extractor(backbone, input_size=256, **kwargs):
     raise ValueError("`backbone` must be one of `[mcait, resnet18, wide_resnet50_2]`")
 
 
-class FeatureExtractorInterface(pl.LightningModule):
+class FeatureExtractorInterface(L.LightningModule):
 
     def __init__(self):
         super(FeatureExtractorInterface, self).__init__()

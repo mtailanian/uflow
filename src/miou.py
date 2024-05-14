@@ -19,14 +19,12 @@ class mIoU(Metric, ABC):
 
     def __init__(
         self,
-        compute_on_step: bool = True,
         dist_sync_on_step: bool = False,
         process_group: Optional[Any] = None,
         dist_sync_fn: Callable = None,
         thresholds: Optional[Union[float, List]] = None
     ):
         super(mIoU, self).__init__(
-            compute_on_step=compute_on_step,
             dist_sync_on_step=dist_sync_on_step,
             process_group=process_group,
             dist_sync_fn=dist_sync_fn
@@ -59,6 +57,6 @@ class mIoU(Metric, ABC):
         return torch.stack(intersections).T, torch.stack(unions).T
 
     def compute(self):
-        self.intersection = torch.cat(self.intersection)
-        self.union = torch.cat(self.union)
-        return torch.mean((self.intersection + EPS) / (self.union + EPS), dim=0)
+        intersection = torch.cat(self.intersection)
+        union = torch.cat(self.union)
+        return torch.mean((intersection + EPS) / (union + EPS), dim=0)

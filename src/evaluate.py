@@ -57,24 +57,25 @@ def reproduce_results(args):
         )
 
         # Load model
-        print("\tLoading model...")
-        flow_model = UFlow(**config['model'])
+        print("\tLoading model...", end=" ")
+        uflow = UFlow(**config['model'])
+        print("Done!")
 
         # Auroc
-        flow_model.from_pretrained(Path("models") / "auc" / f"{category}.ckpt")
-        flow_model.eval()
-        eval_auroc(flow_model, datamodule.val_dataloader(), TARGET_SIZE)
+        uflow.from_pretrained(Path(args.models_dir) / "auc" / f"{category}.ckpt")
+        uflow.eval()
+        eval_auroc(uflow, datamodule.val_dataloader(), TARGET_SIZE)
 
         # Aupro
-        flow_model.from_pretrained(Path("models") / "pro" / f"{category}.ckpt")
-        flow_model.eval()
-        eval_aupro(flow_model, datamodule.val_dataloader(), TARGET_SIZE)
+        uflow.from_pretrained(Path(args.models_dir) / "pro" / f"{category}.ckpt")
+        uflow.eval()
+        eval_aupro(uflow, datamodule.val_dataloader(), TARGET_SIZE)
 
-        # IoU
-        flow_model.from_pretrained(Path("models") / "iou" / f"{category}.ckpt")
-        flow_model.eval()
+        # mIoU
+        uflow.from_pretrained(Path(args.models_dir) / "miou" / f"{category}.ckpt")
+        uflow.eval()
         eval_miou(
-            flow_model,
+            uflow,
             datamodule,
             target_size=TARGET_SIZE
         )
@@ -89,7 +90,7 @@ def eval_auroc(model, dataloader, target_size: Union[None, int] = None):
 
     auroc = metrics.ROC_AUC()
     progress_bar = tqdm(dataloader)
-    progress_bar.set_description("\tComputing AuROC")
+    progress_bar.set_description("\tComputing AUROC")
     for images, targets, img_paths in progress_bar:
         with torch.no_grad():
             z, _ = model.forward(images.to(DEVICE))
@@ -141,11 +142,11 @@ def eval_miou(model, datamodule, target_size: Union[None, int] = None):
     # This would be the code for computing the fair threshold for the case when we do not have an automatic threshold
     # fair_likelihood_thr = get_fair_threshold(model, datamodule.train_dataloader(), TARGET_FPR, target_size)
 
-    nfa_thresholds = list(np.arange(-200, 1001, 20))
+    nfa_thresholds = list(np.arange(-400, 1001, 1))
     miou_metric = mIoU(thresholds=nfa_thresholds)
 
     progress_bar = tqdm(datamodule.val_dataloader())
-    progress_bar.set_description("\tComputing IoU")
+    progress_bar.set_description("\tComputing mIoU")
     for image, target, _ in progress_bar:
         image, targets = image.to(DEVICE), target.to(DEVICE)
 
@@ -222,7 +223,8 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("-cat", "--categories", default=None, type=str, nargs='+')
     p.add_argument("-data", "--data", default="data", type=str)
-    p.add_argument("-hp", "--high-precision", default=False, type=bool)
+    p.add_argument("-models_dir", "--models_dir", default="models", type=str)
+    # p.add_argument("-hp", "--high-precision", default=False, type=bool)
     cmd_args, _ = p.parse_known_args()
 
     # Execute

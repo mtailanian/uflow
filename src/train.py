@@ -10,11 +10,11 @@ from pathlib import Path
 import torch
 import yaml
 from ignite.contrib import metrics
-from pytorch_lightning import LightningModule, Trainer
-from pytorch_lightning.loggers import TensorBoardLogger
+from lightning import LightningModule, Trainer
+from lightning.pytorch.loggers import TensorBoardLogger
+from lightning.pytorch.callbacks import LearningRateMonitor, EarlyStopping
 from torchvision.utils import make_grid
 from torchvision import transforms
-from pytorch_lightning.callbacks import LearningRateMonitor, EarlyStopping
 
 from src.miou import mIoU
 from src.aupro import AUPRO
@@ -87,7 +87,7 @@ class UFlowTrainer(LightningModule):
         self.log_dict({"loss": losses['loss']}, on_step=True, on_epoch=False, prog_bar=False, logger=True)
         return losses
 
-    def training_epoch_end(self, outputs) -> None:
+    def on_training_epoch_end(self, outputs) -> None:
         avg_loss = torch.stack([x['loss'] for x in outputs]).mean()
         self.logger.experiment.add_scalar("02_Train/Loss", avg_loss, self.current_epoch)
 
@@ -142,7 +142,7 @@ class UFlowTrainer(LightningModule):
             image_anomaly_score = torch.amax(anomaly_score, dim=(1, 2, 3))
             self.image_auroc.update((image_anomaly_score.ravel().cpu(), image_targets.ravel().cpu()))
 
-    def validation_epoch_end(self, outputs) -> None:
+    def on_validation_epoch_end(self) -> None:
         # Log metrics
         if self.current_epoch % self.log_every_n_epochs == 0:
             # Compute metrics

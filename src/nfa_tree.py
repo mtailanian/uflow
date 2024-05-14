@@ -57,9 +57,6 @@ class NFATree:
         self.tree = self.build_tree(score)
 
     def compute_log_prob_map(self):
-        log_prob_map = np.empty(self.original_shape[0] * self.original_shape[1], dtype=np.float32)
-        log_prob_map[:] = np.nan
-
         self.compute_log_prob()
 
         self.nfa_prune()
@@ -69,8 +66,10 @@ class NFATree:
             keep_merging = self.nfa_merge()
         self.nfa_prune()
 
+        log_prob_map = np.empty(self.original_shape[0] * self.original_shape[1], dtype=np.float32)
+        log_prob_map[:] = np.nan
+
         final_clusters = self.get_final_clusters()
-        # final_clusters = self.grow_region(final_clusters)
 
         for log_prob, pixels in final_clusters.items():
             log_prob_map[pixels] = log_prob

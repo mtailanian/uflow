@@ -8,7 +8,7 @@ import torch.utils.data
 from PIL import Image
 
 import torch
-import pytorch_lightning as pl
+import lightning as L
 from torchvision import transforms
 
 MEAN = torch.tensor([0.485, 0.456, 0.406], dtype=torch.float32)
@@ -19,7 +19,7 @@ def worker_init_fn(worker_id):
 	np.random.seed(np.random.get_state()[1][0] + worker_id)
 
 
-class MVTecLightningDatamodule(pl.LightningDataModule):
+class MVTecLightningDatamodule(L.LightningDataModule):
 	def __init__(self, data_dir, category, input_size, batch_train, batch_test, shuffle_test=False):
 		super().__init__()
 		self.data_dir = data_dir

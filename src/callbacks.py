@@ -1,5 +1,4 @@
-from pytorch_lightning.callbacks import Callback, ModelCheckpoint
-
+from lightning.pytorch.callbacks import Callback, ModelCheckpoint
 
 class MyPrintingCallback(Callback):
     def on_train_start(self, trainer, pl_module):

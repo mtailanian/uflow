@@ -58,12 +58,8 @@ _Code and trained models are available at https://github.com/mtailanian/uflow._
 Creating virtual environment and installing dependencies   
 ```bash
 # Create conda virtual environment and activate it
-conda create -n uflow python=3.10
+conda create -n uflow python=3.11
 conda activate uflow
-
-# Install pytorch with cuda support
-conda install -c conda-forge cudatoolkit=11.6
-conda install pytorch==1.12.1 torchvision==0.13.1 cudatoolkit=11.6 -c pytorch -c conda-forge
 
 # Install the rest of the dependencies with pip
 pip install -r requirements.txt
