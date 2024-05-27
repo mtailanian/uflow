@@ -15,42 +15,31 @@
 
 This is the official code that implements the paper **U-Flow: A U-shaped Normalizing Flow for Anomaly Detection with Unsupervised Threshold.**
 
-![text](assets/diagram.png?raw=true)
+<div style="text-align: center;" markdown="1">
+<img src="assets/diagram.png" alt="drawing" width="100%"/>
+</div>
+
+## Citation
+
+TODO: complete
+
+```
+@article{tailanian2022u,
+  title={U-Flow: A U-shaped Normalizing Flow for Anomaly Detection with Unsupervised Threshold},
+  author={Tailanian, Mat{\'\i}as and Pardo, {\'A}lvaro and Mus{\'e}, Pablo},
+  journal={arXiv preprint arXiv:2211.12353},
+  year={2022}
+}
+```
 
 ## Abstract   
 
-_In this work we propose a one-class self-supervised method for anomaly segmentation in images that benefits both from a modern machine learning approach and a more classic statistical detection theory. The method consists of four phases. First, features are extracted using a multi-scale image Transformer architecture. Then, these features are fed into a U-shaped Normalizing Flow (NF) that lays the theoretical foundations for the subsequent phases. The third phase computes a pixel-level anomaly map from the NF embedding, and the last phase performs a segmentation based on the a contrario framework. This multiple-hypothesis testing strategy permits the derivation of robust unsupervised detection thresholds, which are crucial in real-world applications where an operational point is needed. The segmentation results are evaluated using the Mean Intersection over Union (mIoU ) metric, and for assessing the generated anomaly maps we report the area under the Receiver Operating Characteristic curve (AUROC), as well as the Area Under the Per-Region-Overlap curve (AUPRO). Extensive experimentation in various datasets shows that the proposed approach produces state-of-the-art results for all metrics and all datasets, ranking first in most MVTec-AD categories, with a mean pixel-level AUROC of 98.74%._
+_In this work we propose a one-class self-supervised method for anomaly segmentation in images that benefits both from a modern machine learning approach and a more classic statistical detection theory. The method consists of four phases. First, features are extracted using a multi-scale image Transformer architecture. Then, these features are fed into a U-shaped Normalizing Flow (NF) that lays the theoretical foundations for the subsequent phases. The third phase computes a pixel-level anomaly map from the NF embedding, and the last phase performs a segmentation based on the a contrario framework. This multiple hypothesis testing strategy permits the derivation of robust unsupervised detection thresholds, which are crucial in real-world applications where an operational point is needed. The segmentation results are evaluated using the Mean Intersection over Union (mIoU) metric, and for assessing the generated anomaly maps we report the area under the Receiver Operating Characteristic curve (AUROC), as well as the Area Under the Per-Region-Overlap curve (AUPRO). Extensive experimentation in various datasets shows that the proposed approach produces state-of-the-art results for all metrics and all datasets, ranking first in most MVTec-AD categories, with a mean pixel-level AUROC of 98.74%._
+
 _Code and trained models are available at https://github.com/mtailanian/uflow._
 
 <div style="text-align: center;" markdown="1">
-<img src="assets/teaser.png" alt="drawing" width="70%"/>
-</div>
-
-## Localization results
-### Pixel AUROC over MVTec-AD Dataset
-
-![text](assets/pixel-auroc.png?raw=true)
-
-### Pixel AUPRO over MVTec-AD Dataset
-
-<div style="text-align: center;" markdown="1">
-<img src="assets/pixel-aupro.png" alt="drawing" width="50%"/>
-</div>
-
-## Segmentation results (mIoU) with threshold log(NFA)=0
-
-<div style="text-align: center;" markdown="1">
-<img src="assets/miou.png" alt="drawing" width="100%"/>
-</div>
-
- ## Results over other datasets
-
-<div style="text-align: center;" markdown="1">
-<img src="assets/more-results-1.png" alt="drawing" width="100%"/>
-</div>
-
-<div style="text-align: center;" markdown="1">
-<img src="assets/more-results-2.png" alt="drawing" width="100%"/>
+<img src="assets/teaser.png" alt="drawing" width="75%"/>
 </div>
 
 ## Setup
@@ -64,6 +53,141 @@ conda activate uflow
 # Install the rest of the dependencies with pip
 pip install -r requirements.txt
  ```   
+
+## Execution
+
+There are three main files to execute: `train.py`, `predict.py`, and `evaluate.py`.
+All scripts are to be run from the root directory `<uflow-root>`.
+
+You might need to add this folder to the pythonpath:
+```bash
+export PYTHONPATH=$PYTHONPATH:<uflow-root>
+```
+
+### Train
+
+For training, the only command line argument required is the category:
+```bash
+usage: train.py [-h] -cat CATEGORY [-config CONFIG_PATH] [-data DATA] [-train_dir TRAINING_DIR]
+```
+
+A basic execution could be for example:
+```bash
+python src/train.py -cat carpet
+```
+
+Command line arguments:
+
+| **Argument short name** | **Argument long name** |                                                                        **Description**                                                                        |                             **Default value**                             |
+|:-----------------------:|:----------------------:|:-------------------------------------------------------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------:|
+|          -cat           |       --category       | MvTec category to train. One of [carpet, grid, leather, tile, wood, bottle, cable, capsule, hazelnut, metal_nut, pill, screw, toothbrush, transistor, zipper] |                         None (mandatory argument)                         |
+|         -config         |     --config_path      |                                       Config file path. If Not specified, uses the default config in `configs` folder.                                        | None: loads the config in `configs` folder for the corresponding category |
+|          -data          |         --data         |                                 Folder with MvTec AD dataset. Inside this folder there must be one folder for each category.                                  |                           uflow-root/data/mvtec                           |
+|       -train_dir        |     --training_dir     |                                                             Folder to save training experiments.                                                              |                            uflow-root/training                            |
+
+
+The script will generate logs inside `<uflow-root>/training` folder (or a different one if you changed it with the command line arguments), and will log metrics and images to tensorboard.
+
+Tensorboard can be executed as:
+```bash
+cd <uflow-root>/training
+tensorboard --logdir .
+```
+
+### Predict
+This script performs the inference image by image for the chosen category and displays the results.
+
+```bash
+usage: predict.py [-h] -cat CATEGORY [-data DATA]
+```
+
+| **Argument short name** | **Argument long name** |                                                                        **Description**                                                                        |   **Default value**   |
+|:-----------------------:|:----------------------:|:-------------------------------------------------------------------------------------------------------------------------------------------------------------:|:---------------------:|
+|          -cat           |       --category       | MvTec category to train. One of [carpet, grid, leather, tile, wood, bottle, cable, capsule, hazelnut, metal_nut, pill, screw, toothbrush, transistor, zipper] |        carpet         |
+|          -data          |         --data         |                                 Folder with MvTec AD dataset. Inside this folder there must be one folder for each category.                                  | uflow-root/data/mvtec |
+
+For example use like this:
+```bash
+python src/predict.py -cat carpet
+```
+
+### Evaluate
+This script run the inference and evaluates auroc and segmentation iou, for reproducing results.
+
+```bash
+usage: evaluate.py [-h] -cat CATEGORIES [CATEGORIES ...] [-data DATA]
+                   [-hp HIGH_PRECISION]
+```
+
+| **Argument short name** | **Argument long name** |                                                                            **Description**                                                                            |            **Default value**             |
+|:-----------------------:|:----------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:----------------------------------------:|
+|          -cat           |      --categories      | MvTec categories to train. A subset of [carpet, grid, leather, tile, wood, bottle, cable, capsule, hazelnut, metal_nut, pill, screw, toothbrush, transistor, zipper]. | None: meaning to run over all categories |
+|          -data          |         --data         |                                     Folder with MvTec AD dataset. Inside this folder there must be one folder for each category.                                      |          uflow-root/data/mvtec           |
+|           -hp           |    --high-precision    |         Whether to use high precision for computing the NFA values or not. High precision acieves slightly better performance but takes more time to execute.         |                  False                   | 
+
+Example usage for two categories:
+```bash
+python src/evaluate.py -cat carpet grid
+```
+
+
+## [Optional] Download pre-trained models - Option 1
+
+If you are to reproduce the paper results, you could download the pre-trained models that were used to obtain the actual results, or you can even train a model with the provided code (explained in next section).
+
+Pre-trained models for MVTec can be found in [this release](https://github.com/mtailanian/uflow/releases/tag/trained-models-for-all-mvtec-categories)
+
+## [Optional] Download pre-trained models - Option 2
+
+For downloading the pre-trained models, go to project root directory and execute the `download_models.py` script in the following way:
+
+First, go to the root directory:
+```bash
+cd <uflow-root>
+```
+
+Then execute the following script:
+
+```bash
+usage: download_models.py [-h] [-cat CATEGORIES [CATEGORIES ...]] [-overwrite FORCE_OVERWRITE]
+```
+
+| **Argument short name** | **Argument long name** |                                                                                 **Description**                                                                                  |                **Default value**                 |
+|:-----------------------:|:----------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------:|
+|          -cat           |      --categories      | MvTec categories to download. None or a subset of [carpet, grid, leather, tile, wood, bottle, cable, capsule, hazelnut, metal_nut, pill, screw, toothbrush, transistor, zipper]. | None: meaning to download all categories at once |
+|       -overwrite        |   --force-overwrite    |                              If a certain model is already downloaded, this flag is used to decide whether to download it again anyway or skip it.                               |                      False                       | 
+
+
+For example, to download all models for only carpet:
+```bash
+python download_models.py -cat carpet
+```
+
+For downloading models for both carpet and grid, and overwrite if already downloaded:
+```bash
+python download_models.py -cat carpet grid -overwrite true
+```
+
+To download all models at once:
+```bash
+python download_models.py
+```
+
+### Troubleshooting
+Sometimes, when attempting to download files too frequently, `gdown` gives an error similar to this:
+
+> Access denied with the following error:
+> 
+>  	Cannot retrieve the public link of the file. You may need to change
+> 	the permission to 'Anyone with the link', or have had many accesses.
+> 
+> You may still be able to access the file from the browser:
+> 
+> 	 https://drive.google.com/u/1/uc?id=12ZgoyzBWoip1FfmuEiQc0NDweXJr5uNd&export=download
+
+**In that case there are two options: wait a couple of hours (probably 24 hours), or download by hand by entering to [this url](https://drive.google.com/drive/folders/1W1rE0mu4Lv3uWHA5GZigmvVNlBVHqTv_?usp=sharing)**.
+
+If downloading by hand please remember to use the same folder's structure as in Google Drive, inside the `<uflow-root>/models` directory.
 
 ## Download data
 
@@ -110,138 +234,53 @@ https://www.kaggle.com/datasets/mateuszbuda/lgg-mri-segmentation
 
 https://svip-lab.github.io/dataset/campus_dataset.html
 
-## [Optional] Download pre-trained models - Option 1
 
-If you are to reproduce the paper results, you could download the pre-trained models that were used to obtain the actual results, or you can even train a model with the provided code (explained in next section).
-For downloading the pre-trained models, go to project root directory and execute the `download_models.py` script in the following way:
+## Results
+### Pixel AUROC over MVTec-AD Dataset
 
-First, go to the root directory:
-```bash
-cd <uflow-root>
-```
+<div style="text-align: center;" markdown="1">
+<img src="assets/pixel-auroc.png" alt="drawing" width="100%"/>
+</div>
 
-Then execute the following script:
+### Pixel AUPRO over MVTec-AD Dataset
 
-```bash
-usage: download_models.py [-h] [-cat CATEGORIES [CATEGORIES ...]] [-overwrite FORCE_OVERWRITE]
-```
+<div style="text-align: center;" markdown="1">
+<img src="assets/pixel-aupro.png" alt="drawing" width="100%"/>
+</div>
 
-| **Argument short name** | **Argument long name** |                                                                                 **Description**                                                                                  |                **Default value**                 |
-|:-----------------------:|:----------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------:|
-|          -cat           |      --categories      | MvTec categories to download. None or a subset of [carpet, grid, leather, tile, wood, bottle, cable, capsule, hazelnut, metal_nut, pill, screw, toothbrush, transistor, zipper]. | None: meaning to download all categories at once |
-|       -overwrite        |   --force-overwrite    |                              If a certain model is already downloaded, this flag is used to decide whether to download it again anyway or skip it.                               |                      False                       | 
+## Segmentation results (mIoU) with threshold log(NFA)=0
 
+<div style="text-align: center;" markdown="1">
+<img src="assets/miou.png" alt="drawing" width="100%"/>
+</div>
 
-For example, to download all models for only carpet:
-```bash
-python download_models.py -cat carpet
-```
+ ## Results over other datasets
 
-For downloading models for two carpet and grid, and overwrite if already downloaded:
-```bash
-python download_models.py -cat carpet grid -overwrite true
-```
+<div style="text-align: center;" markdown="1">
+<img src="assets/more-results-1.png" alt="drawing" width="100%"/>
+</div>
 
-To download all models at once:
-```bash
-python download_models.py
-```
+<div style="text-align: center;" markdown="1">
+<img src="assets/more-results-2.png" alt="drawing" width="100%"/>
+</div>
 
-### Troubleshooting
-Sometimes, when attempting to download files too frequently, `gdown` gives an error similar to this:
+## Example results
 
-> Access denied with the following error:
-> 
->  	Cannot retrieve the public link of the file. You may need to change
-> 	the permission to 'Anyone with the link', or have had many accesses.
-> 
-> You may still be able to access the file from the browser:
-> 
-> 	 https://drive.google.com/u/1/uc?id=12ZgoyzBWoip1FfmuEiQc0NDweXJr5uNd&export=download
+### Anomalies
+#### MVTec
+![text](assets/results-mvtec-anomalies.jpg)
 
-**In that case there are two options: wait a couple of hours (probably 24 hours), or download by hand by entering to [this url](https://drive.google.com/drive/folders/1W1rE0mu4Lv3uWHA5GZigmvVNlBVHqTv_?usp=sharing)**.
+#### BeanTech, LGG MRI, STC
+![text](assets/results-others-anomalies.jpg)
 
-If downloading by hand please remember to use the same folder's structure as in Google Drive, inside the `<uflow-root>/models` directory.
+### Normal images
 
-## [Optional] Download pre-trained models - Option 2
+#### MVTec
+![text](assets/results-mvtec-good.jpg)
 
-Pre-trained models for MVTec can also be found in [this release](https://github.com/mtailanian/uflow/tree/main/configs)
+#### BeanTech, LGG MRI, STC
+![text](assets/results-others-good.jpg)
 
-## Execution
-
-There are three main files to execute: `train.py`, `predict.py`, and `evaluate.py`.
-All scripts are to be run from the root directory `<uflow-root>`.
-
-You might need to add this folder to the pythonpath:
-```bash
-export PYTHONPATH=$PYTHONPATH:<uflow-root>
-```
-
-### Train
-
-For training, the only command line argument required is the category:
-```bash
-usage: train.py [-h] -cat CATEGORY [-config CONFIG_PATH] [-data DATA] [-train_dir TRAINING_DIR]
-```
-
-A basic execution could be for example:
-```bash
-python src/train.py -cat carpet
-```
-
-Command line arguments:
-
-| **Argument short name** | **Argument long name** |                                                                        **Description**                                                                        |                             **Default value**                             |
-|:-----------------------:|:----------------------:|:-------------------------------------------------------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------:|
-|          -cat           |       --category       | MvTec category to train. One of [carpet, grid, leather, tile, wood, bottle, cable, capsule, hazelnut, metal_nut, pill, screw, toothbrush, transistor, zipper] |                         None (mandatory argument)                         |
-|         -config         |     --config_path      |                                       Config file path. If Not specified, uses the default config in `configs` folder.                                        | None: loads the config in `configs` folder for the corresponding category |
-|          -data          |         --data         |                                 Folder with MvTec AD dataset. Inside this folder there must be one folder for each category.                                  |                              uflow-root/data                              |
-|       -train_dir        |     --training_dir     |                                                             Folder to save training experiments.                                                              |                            uflow-root/training                            |
-
-
-The script will generate logs inside `<uflow-root>/training` folder (or a different one if you changed it with the command line arguments), and will log metrics and images to tensorboard.
-
-Tensorboard can be executed as:
-```bash
-cd <uflow-root>/training
-tensorboard --logdir .
-```
-
-### Predict
-This script performs the inference image by image for the chosen category and displays the results.
-
-```bash
-usage: predict.py [-h] -cat CATEGORY [-data DATA]
-```
-
-| **Argument short name** | **Argument long name** |                                                                        **Description**                                                                        |   **Default value**   |
-|:-----------------------:|:----------------------:|:-------------------------------------------------------------------------------------------------------------------------------------------------------------:|:---------------------:|
-|          -cat           |       --category       | MvTec category to train. One of [carpet, grid, leather, tile, wood, bottle, cable, capsule, hazelnut, metal_nut, pill, screw, toothbrush, transistor, zipper] |        carpet         |
-|          -data          |         --data         |                                 Folder with MvTec AD dataset. Inside this folder there must be one folder for each category.                                  |    uflow-root/data    |
-
-For example use like this:
-```bash
-python src/predict.py -cat carpet
-```
-
-### Evaluate
-This script run the inference and evaluates auroc and segmentation iou, for reproducing results.
-
-```bash
-usage: evaluate.py [-h] -cat CATEGORIES [CATEGORIES ...] [-data DATA]
-                   [-hp HIGH_PRECISION]
-```
-
-| **Argument short name** | **Argument long name** |                                                                            **Description**                                                                            |            **Default value**             |
-|:-----------------------:|:----------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:----------------------------------------:|
-|          -cat           |      --categories      | MvTec categories to train. A subset of [carpet, grid, leather, tile, wood, bottle, cable, capsule, hazelnut, metal_nut, pill, screw, toothbrush, transistor, zipper]. | None: meaning to run over all categories |
-|          -data          |         --data         |                                     Folder with MvTec AD dataset. Inside this folder there must be one folder for each category.                                      |             uflow-root/data              |
-|           -hp           |    --high-precision    |         Whether to use high precision for computing the NFA values or not. High precision acieves slightly better performance but takes more time to execute.         |                  False                   | 
-
-Example usage for two categories:
-```bash
-python src/evaluate.py -cat carpet grid
-```
 
 ## A note on sizes at different points
 
@@ -263,40 +302,11 @@ Normalizing Flow outputs
 
 `/ 2` corresponds to the split, and `/ 4` to the invertible upsample.
 
-## Example results
-
-### Anomalies
-#### MVTec
-![text](assets/results-mvtec-anomalies.jpg?raw=true)
-
-#### BeanTech, LGG MRI, STC
-![text](assets/results-others-anomalies.jpg?raw=true)
-
-### Normal images
-
-#### MVTec
-![text](assets/results-mvtec-good.jpg?raw=true)
-
-#### BeanTech, LGG MRI, STC
-![text](assets/results-others-good.jpg?raw=true)
-
-## Citation
-
-TODO: complete
-
-```
-@article{tailanian2022u,
-  title={U-Flow: A U-shaped Normalizing Flow for Anomaly Detection with Unsupervised Threshold},
-  author={Tailanian, Mat{\'\i}as and Pardo, {\'A}lvaro and Mus{\'e}, Pablo},
-  journal={arXiv preprint arXiv:2211.12353},
-  year={2022}
-}
-```
 
 Copyright and License
 ---------------------
 
-Copyright (c) 2021-2022 Matias Tailanian <mtailanian@gmail.com>
+Copyright (c) 2021-2022 Matias Tailanian
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
