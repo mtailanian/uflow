@@ -8,7 +8,7 @@
 
 ### Link to download paper:
 
-[![JMIV](https://img.shields.io/badge/JMIV-UFlow-yellow.svg?style=for-the-badge)]()
+[![JMIV](https://img.shields.io/badge/JMIV-UFlow-yellow.svg?style=for-the-badge)](https://link.springer.com/article/10.1007/s10851-024-01193-y)
 [![Arxiv](https://img.shields.io/badge/arXiv-2110.02407-blue.svg?style=for-the-badge)](https://arxiv.org/abs/2211.12353)
  
 </div>
@@ -21,14 +21,17 @@ This is the official code that implements the paper **U-Flow: A U-shaped Normali
 
 ## Citation
 
-TODO: complete
-
 ```
-@article{tailanian2022u,
-  title={U-Flow: A U-shaped Normalizing Flow for Anomaly Detection with Unsupervised Threshold},
-  author={Tailanian, Mat{\'\i}as and Pardo, {\'A}lvaro and Mus{\'e}, Pablo},
-  journal={arXiv preprint arXiv:2211.12353},
-  year={2022}
+@article{Tailanian2024uflow,
+  title = {U-Flow: A U-Shaped Normalizing Flow for Anomaly Detection with Unsupervised Threshold},
+  ISSN = {1573-7683},
+  url = {http://dx.doi.org/10.1007/s10851-024-01193-y},
+  DOI = {10.1007/s10851-024-01193-y},
+  journal = {Journal of Mathematical Imaging and Vision},
+  publisher = {Springer Science and Business Media LLC},
+  author = {Tailanian, Matías and Pardo, Álvaro and Musé, Pablo},
+  year = {2024},
+  month = may 
 }
 ```
 
@@ -39,7 +42,7 @@ _In this work we propose a one-class self-supervised method for anomaly segmenta
 _Code and trained models are available at https://github.com/mtailanian/uflow._
 
 <div style="text-align: center;" markdown="1">
-<img src="assets/teaser.png" alt="drawing" width="75%"/>
+<img src="assets/teaser.png" alt="drawing" width="100%"/>
 </div>
 
 ## Setup
