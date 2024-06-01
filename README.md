@@ -29,7 +29,7 @@ This is the official code that implements the paper **U-Flow: A U-shaped Normali
   DOI = {10.1007/s10851-024-01193-y},
   journal = {Journal of Mathematical Imaging and Vision},
   publisher = {Springer Science and Business Media LLC},
-  author = {Tailanian, Matías and Pardo, Álvaro and Musé, Pablo},
+  author = {Tailanian, Mat\'ias and Pardo, \'Alvaro and Mus\'e, Pablo},
   year = {2024},
   month = may 
 }
