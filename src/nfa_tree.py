@@ -1,5 +1,13 @@
+"""Description:
+    This module contains the implementation of the NFA tree algorithm, used in the U-Flow model to compute the
+    log-probability map from the latent variables, and then generate a mask, performing an automatic segmentation of
+    anomalies.
+    We construct a tree of upper level sets from the latent variables, and compute the log-probability of each region in
+    the image. We then perform a prune and merge process to remove nodes with high PFA values. The final tree is used to
+    compute the log-NFA, which is used to obtain the segmentation mask with an automatic threshold.
+"""
 import itertools as it
-from typing import List
+from typing import Union, List
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -47,7 +55,11 @@ def compute_nfa_anomaly_score_tree(
 
 
 class NFATree:
-    def __init__(self, zi):
+    """Class for building a NFA tree of upper level sets, from a latent variable."""
+    def __init__(self, zi: torch.Tensor):
+        """Args:
+        zi (torch.Tensor): Latent variable of shape (C, H, W).
+        """
         self.n_channels = zi.shape[0]
         self.zi2_rav = zi.reshape(self.n_channels, -1).cpu().numpy() ** 2
 
@@ -56,15 +68,19 @@ class NFATree:
         self.original_shape = score.shape
         self.tree = self.build_tree(score)
 
-    def compute_log_prob_map(self):
+    def compute_log_prob_map(self) -> np.ndarray:
+        """Compute the log probability map
+        First compute the log probability of each node of the tree. Then, apply the prune and merge steps iteratively
+        until no more changes are done in the tree. Finally, get the final clusters and build the log probability map.
+        """
         self.compute_log_prob()
 
-        self.nfa_prune()
-        keep_merging = self.nfa_merge()
+        self.pfa_prune()
+        keep_merging = self.pfa_merge()
         while keep_merging:
-            self.nfa_prune()
-            keep_merging = self.nfa_merge()
-        self.nfa_prune()
+            self.pfa_prune()
+            keep_merging = self.pfa_merge()
+        self.pfa_prune()
 
         log_prob_map = np.empty(self.original_shape[0] * self.original_shape[1], dtype=np.float32)
         log_prob_map[:] = np.nan
@@ -90,6 +106,9 @@ class NFATree:
         return log_prob_map
 
     def compute_log_prob(self):
+        """Compute the log probability of each node in the tree. The log probability is computed using the Chernoff bound
+        for a Chi2 distribution of `self.n_channels` degrees of freedom.
+        """
         zi2_sum = np.sum(self.zi2_rav, axis=0)
 
         for n in self.tree.nodes:
@@ -102,7 +121,8 @@ class NFATree:
             # Log prob for the whole region
             self.tree.nodes[n]['log_prob'] = len(region) * log_prob
 
-    def build_tree(self, score):
+    def build_tree(self, score: np.ndarray) -> nx.DiGraph:
+        """Build a tree from the score map."""
         parents, pixel_indices = max_tree(score, connectivity=1)
         parents_rav = parents.ravel()
         score_rav = score.ravel()
@@ -119,9 +139,7 @@ class NFATree:
         return tree
 
     def prune(self, graph, starting_node):
-        """
-        Transform a canonical max tree to a max tree.
-        """
+        """Transform a canonical max tree to a max tree."""
         value = graph.nodes[starting_node]['score']
         cluster_nodes = [starting_node]
         for p in [p for p in graph.predecessors(starting_node)]:
@@ -134,15 +152,16 @@ class NFATree:
         return
 
     def accumulate(self, graph, starting_node):
-        """
-        Transform a max tree to a component tree.
-        """
+        """Transform a max tree to a component tree."""
         pixels = graph.nodes[starting_node]['pixels']
         for p in graph.predecessors(starting_node):
             pixels.extend(self.accumulate(graph, p))
         return pixels
 
-    def get_branch(self, starting_node):
+    def get_branch(self, starting_node: int) -> list[int]:
+        """Get a connected section of the tree, starting from `starting_node`, where all nodes have exactly one predecessor
+        (except for the starting leaf itself)
+        """
         branch = [starting_node]
         successors = [s for s in self.tree.successors(starting_node)]
 
@@ -156,6 +175,10 @@ class NFATree:
         return branch
 
     def get_final_clusters(self):
+        """Get the final clusters of the tree.
+        The final clusters are the leaves of the final tree, where each leaf is the node with the lowest log probability
+        in its branch.
+        """
         leaves = [p for p in self.tree.pred if len(self.tree.pred[p]) == 0]
         final_clusters = {}
         for l in leaves:
@@ -165,7 +188,13 @@ class NFATree:
             final_clusters[self.tree.nodes[branch_chosen_node]['log_prob']] = self.tree.nodes[branch_chosen_node]['pixels']
         return final_clusters
 
-    def nfa_prune(self):
+    def pfa_prune(self):
+        """Procedure 1 in the paper (https://link.springer.com/article/10.1007/s10851-024-01193-y).
+        This procedure aims to filter a set of nested connected components, keeping only the most significant one. We
+        identify which of these connected components is the most significant one, as it may better delineate the
+        anomalous region. After determining which node to preserve, the tree is pruned so that just the chosen node is
+        kept, and all other branch nodes are removed.
+        """
         leaves = [p for p in self.tree.pred if len(self.tree.pred[p]) == 0]
         for l in leaves:
             branch_nodes = self.get_branch(l)
@@ -178,7 +207,12 @@ class NFATree:
                     )
                     self.tree.remove_node(branch_nodes[i])
 
-    def nfa_merge(self):
+    def pfa_merge(self):
+        """Procedure 2 in the paper (https://link.springer.com/article/10.1007/s10851-024-01193-y).
+        The second procedure consists of merging leaf nodes with the same successor in case the latter is more
+        significant than all others. In this case, all leaf nodes are removed from the tree, and we only keep their
+        successor.
+        """
         merged = False
         bifurcations = [p for p in self.tree.pred if len(self.tree.pred[p]) > 1]
         for b in bifurcations:
@@ -197,7 +231,12 @@ class NFATree:
         return merged
 
 
-def compute_number_of_tests(polyominoes_sizes):
+def compute_number_of_tests(polyominoes_sizes: Union[int, list[int]]) -> float:
+    """Compute the number of tests for the NFA tree, corresponding to all possible regions with arbitrary shape and size in
+    the image. Considering 4-connectivity, these groups of connected pixels correspond to the figures called polyominoes
+    and a good approximation for the number of polyominoes is given by this formula. See references [60] and [61] in the
+    U-Flow paper for more details.
+    """
     alpha = mp.mpf(0.316915)
     beta = mp.mpf(4.062570)
 
