@@ -21,7 +21,8 @@ from src.aupro import AUPRO
 from src.model import UFlow
 from src.nfa_tree import compute_nfa_anomaly_score_tree
 from src.datamodule import MVTecLightningDatamodule, mvtec_un_normalize, get_debug_images_paths
-from src.callbacks import MyPrintingCallback, ModelCheckpointByAuROC, ModelCheckpointBymIoU, ModelCheckpointByInterval
+from src.callbacks import MyPrintingCallback, ModelCheckpointByAuROC, ModelCheckpointByAuPRO, ModelCheckpointBymIoU
+# from src.callbacks import ModelCheckpointByInterval
 
 warnings.filterwarnings("ignore", category=UserWarning, message="Your val_dataloader has `shuffle=True`")
 warnings.filterwarnings("ignore", category=UserWarning, message="Checkpoint directory .* exists and is not empty")
@@ -270,6 +271,7 @@ def train(args):
     callbacks = [
         MyPrintingCallback(),
         ModelCheckpointByAuROC(training_dir),
+        ModelCheckpointByAuPRO(training_dir),
         ModelCheckpointBymIoU(training_dir),
         # ModelCheckpointByInterval(training_dir, config['trainer']['save_ckpt_every']),
         LearningRateMonitor('epoch'),

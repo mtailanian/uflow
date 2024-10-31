@@ -19,6 +19,17 @@ class ModelCheckpointByAuROC(ModelCheckpoint):
         )
 
 
+class ModelCheckpointByAuPRO(ModelCheckpoint):
+    def __init__(self, experiment_path):
+        super(ModelCheckpointByAuPRO, self).__init__(
+            monitor='pixel_aupro',
+            dirpath=str(experiment_path),
+            mode='max',
+            filename='best_val_roc_pro__epoch_{epoch:04d}__pixel_aupro_{pixel_aupro:.4f}',
+            auto_insert_metric_name=False,
+        )
+
+
 class ModelCheckpointBymIoU(ModelCheckpoint):
     def __init__(self, experiment_path):
         super(ModelCheckpointBymIoU, self).__init__(
