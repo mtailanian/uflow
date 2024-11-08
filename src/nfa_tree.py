@@ -6,6 +6,7 @@
     the image. We then perform a prune and merge process to remove nodes with high PFA values. The final tree is used to
     compute the log-NFA, which is used to obtain the segmentation mask with an automatic threshold.
 """
+import sys
 import itertools as it
 from typing import Union, List
 
@@ -16,6 +17,8 @@ import torch
 from mpmath import mp
 from skimage.morphology import max_tree
 from torch.nn import functional as F
+
+sys.setrecursionlimit(100000)
 
 mp.dps = 15
 SHOW = False
